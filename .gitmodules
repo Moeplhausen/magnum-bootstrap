@@ -1,3 +1,9 @@
 [submodule "toolchains"]
 	path = toolchains
 	url = git://github.com/mosra/toolchains.git
+[submodule "libs/corrade"]
+	path = libs/corrade
+	url = git@github.com:mosra/corrade.git
+[submodule "libs/magnum"]
+	path = libs/magnum
+	url = git@github.com:mosra/magnum.git
