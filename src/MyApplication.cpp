@@ -1,3 +1,4 @@
+#include <Corrade/PluginManager/Manager.h>
 #include <Magnum/DefaultFramebuffer.h>
 #include <Magnum/Renderer.h>
 #include <Magnum/Platform/Sdl2Application.h>
@@ -8,8 +9,23 @@
 #include "3dObjects/Sphere.h"
 
 
+#include <Magnum/Trade/AbstractImporter.h>
+#include "configure.h"
+#include <Magnum/Text/AbstractFont.h>
+#include <Magnum/Text/DistanceFieldGlyphCache.h>
+
 using namespace Magnum;
 using namespace EMTypes;
+
+
+#ifdef MAGNUM_BUILD_STATIC
+/* Import plugins in static build */
+static int importStaticPlugins() {
+    CORRADE_PLUGIN_IMPORT(StbTrueTypeFont)
+    return 0;
+} CORRADE_AUTOMATIC_INITIALIZER(importStaticPlugins)
+#endif
+
 
 class MyApplication: public Platform::Application {
     public:
@@ -27,10 +43,35 @@ class MyApplication: public Platform::Application {
     SceneGraph::DrawableGroup3D _drawables;
 
 
+    Magnum::PluginManager::Manager<Magnum::Text::AbstractFont> _fontManager;
+    std::unique_ptr<Magnum::Text::AbstractFont> _font;
+    Text::DistanceFieldGlyphCache _glyphCache;
+
+
     void drawEvent() override;
 };
 
-MyApplication::MyApplication(const Arguments& arguments): Platform::Application{arguments} {
+MyApplication::MyApplication(const Arguments& arguments): Platform::Application{arguments}, _fontManager{MAGNUM_PLUGINS_FONT_DIR},
+                                     _glyphCache(Vector2i(2048), Vector2i(512), 22) {
+
+
+
+    /* Load TTF font plugin */
+    if (!(_font = _fontManager.loadAndInstantiate("TrueTypeFont")))
+        std::exit(1);
+
+    /* Open the font */
+    if (!_font->openSingleData(Utility::Resource{"MagnumUiGallery"}.getRaw("SourceSansPro-Regular.ttf"),
+                               18.0f * defaultFramebuffer.viewport().size().x() / 800
+    ))
+        std::exit(1);
+    //Comment next line and it doesn't crash on windows
+    _font.get()->fillGlyphCache(_glyphCache, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:-+,.!° ");
+
+
+
+
+
     /* Camera setup */
     Matrix4 projectionMatrix = Matrix4::perspectiveProjection(35.0_degf, 1.333f, 0.001f, 3000.0f);
     //Matrix4 projectionMatrix = Matrix4::orthographicProjection({4.0f,3.0f}, 3.0f, 100.0f);
