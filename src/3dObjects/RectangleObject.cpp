@@ -15,8 +15,8 @@ namespace EMTypes {
         RectangleObject::RectangleObject(const Vector3& color, Object3D* parent, SceneGraph::DrawableGroup3D* group): Object3D(parent), SceneGraph::Drawable3D(*this, group),  color(color) {
             ViewerResourceManager& manager = ViewerResourceManager::instance();
 
-            /* Cube mesh */
-            if(!(_cube = manager.get<Mesh>("cube"))) {
+            _cube = manager.get<Mesh>("cube");
+            if(_cube.state() == ResourceState::NotLoaded || _cube.state() == ResourceState::NotLoadedFallback) {
 
 
                 const Trade::MeshData3D cubeData = Primitives::Cube::solid();

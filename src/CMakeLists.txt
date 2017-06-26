@@ -1,7 +1,6 @@
 find_package(Magnum REQUIRED
         SceneGraph
         Shaders
-        Text
         MeshTools
         Primitives
         Sdl2Application)
@@ -22,7 +21,7 @@ set(SOURCE_FILES
         MyApplication.cpp
         Types.cpp
         3dObjects/RectangleObject.cpp
-        3dObjects/Sphere.cpp)
+        3dObjects/Sphere.cpp 3dObjects/Plane.cpp 3dObjects/Plane.h)
 
 add_executable(WebGlResourceManager ${SOURCE_FILES} ${TransGUI_RESOURCES})
 target_link_libraries(WebGlResourceManager
@@ -30,7 +29,6 @@ target_link_libraries(WebGlResourceManager
         Magnum::Magnum
         Magnum::SceneGraph
         Magnum::Shaders
-        Magnum::Text
         Magnum::Primitives
         Magnum::MeshTools)
 
@@ -43,6 +41,6 @@ endif()
 
 if(CORRADE_TARGET_EMSCRIPTEN)
     install(TARGETS WebGlResourceManager DESTINATION ${CMAKE_INSTALL_PREFIX})
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/WebGLResourceManager.js.mem DESTINATION ${CMAKE_INSTALL_PREFIX} OPTIONAL)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/WebGlResourceManager.js.mem DESTINATION ${CMAKE_INSTALL_PREFIX} OPTIONAL)
     install(FILES MyApplication.html EmscriptenApplication.js WebApplication.css DESTINATION ${CMAKE_INSTALL_PREFIX})
 endif()

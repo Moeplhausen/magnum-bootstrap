@@ -7,12 +7,13 @@
 
 #include "3dObjects/RectangleObject.h"
 #include "3dObjects/Sphere.h"
+#include "3dObjects/Plane.h"
 
 
 #include <Magnum/Trade/AbstractImporter.h>
 #include "configure.h"
 #include <Magnum/Text/AbstractFont.h>
-#include <Magnum/Text/DistanceFieldGlyphCache.h>
+#include <Magnum/Text/GlyphCache.h>
 
 using namespace Magnum;
 using namespace EMTypes;
@@ -43,30 +44,14 @@ class MyApplication: public Platform::Application {
     SceneGraph::DrawableGroup3D _drawables;
 
 
-    Magnum::PluginManager::Manager<Magnum::Text::AbstractFont> _fontManager;
-    std::unique_ptr<Magnum::Text::AbstractFont> _font;
-    Text::DistanceFieldGlyphCache _glyphCache;
 
 
     void drawEvent() override;
 };
 
-MyApplication::MyApplication(const Arguments& arguments): Platform::Application{arguments}, _fontManager{MAGNUM_PLUGINS_FONT_DIR},
-                                     _glyphCache(Vector2i(2048), Vector2i(512), 22) {
+MyApplication::MyApplication(const Arguments& arguments): Platform::Application{arguments}
+                                   {
 
-
-
-    /* Load TTF font plugin */
-    if (!(_font = _fontManager.loadAndInstantiate("TrueTypeFont")))
-        std::exit(1);
-
-    /* Open the font */
-    if (!_font->openSingleData(Utility::Resource{"MagnumUiGallery"}.getRaw("SourceSansPro-Regular.ttf"),
-                               18.0f * defaultFramebuffer.viewport().size().x() / 800
-    ))
-        std::exit(1);
-    //Comment next line and it doesn't crash on windows
-    _font.get()->fillGlyphCache(_glyphCache, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:-+,.!° ");
 
 
 
@@ -99,7 +84,8 @@ MyApplication::MyApplication(const Arguments& arguments): Platform::Application{
 
 
     (new RectangleObject({0.0f, 0.0f, 1.0f}, _rootobj, &_drawables))->setTransformation(transformationMatrix1);
-    (new Sphere({1.0f, 0.0f, 0.0f}, _rootobj, &_drawables))->setTransformation(transformationMatrix2);
+    //(new Sphere({1.0f, 0.0f, 0.0f}, _rootobj, &_drawables))->setTransformation(transformationMatrix2);
+    (new Plane({1.0f, 0.0f, 0.0f}, _rootobj, &_drawables))->setTransformation(transformationMatrix2);
 
 
 }
@@ -111,6 +97,7 @@ void MyApplication::drawEvent() {
 
     _camera->draw(_drawables);
     swapBuffers();
+    redraw();
 }
 
 MAGNUM_APPLICATION_MAIN(MyApplication)
